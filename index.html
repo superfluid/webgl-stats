@@ -2,49 +2,86 @@
 <html>
 	<head>
 		<!-- Global site tag (gtag.js) - Google Analytics -->
-		<script async src="https://www.googletagmanager.com/gtag/js?id=UA-178010779-1"></script>
+		<script src="https://www.googletagmanager.com/gtag/js"></script>
 		<script>
 			window.dataLayer = window.dataLayer || [];
 			function gtag(){dataLayer.push(arguments);}
 			gtag('js', new Date());
-			gtag('config', 'UA-178010779-1');
-			
-			// we have 20 numbers and 20 words to spend
-			// for extensions, we can do the same, tho we don't catch new / unknown extensions this way
-			// like 40 values
-			// how do we unpack this for graphing? -> Calculated metrics! But it's hard, we only have basic operators that probably doesn't include &
-
-			// we need to say, `what percent of page views had
-			/**
-			 * Metrics:
-			 * - `metric0` 'api-support' (scope: Hit, Formatting: Integer)
-			 * bitwise bool array
-			 * WebGL WebGL2 WebGPU
-			 */
-			// can compress webgl, webgl2 and webgpu support to 3 bits in 1 metric
 
 			(function(){
-				var canvas = document.createElement('canvas');
-				var gl1 = canvas.getContext('webgl');
-				var gl2 = canvas.getContext('webgl2');
-				var wgpu = canvas.getContext('gpu') | canvas.getContext('gpu-present');
-
-				function composeBitset(boolArray) {
-					var value = 0;
-					for (var i = 0; i < boolArray.length; i++)  {
-						value = value | ((boolArray[i]?1:0) << i);
-					}
-					return value;
+				var accountIds = {
+					account1: 'UA-178010779-1',
+					account2: 'UA-178078874-1',
 				}
+				gtag('config', accountIds.account1, {
+					'custom_map': {
+						'dimension1': 'webgl1',
+						'dimension2': 'webgl2',
+						'dimension3': 'webgpu',
 
-				var api = composeBitset([
-					gl1 != null,
-					gl2 != null,
-					wgpu != null,
-				]);
+						'dimension4': 'ANGLE_instanced_arrays',
+						'dimension5': 'EXT_blend_minmax',
+						'dimension6': 'EXT_clip_cull_distance',
+						'dimension7': 'EXT_color_buffer_float',
+						'dimension8': 'EXT_color_buffer_half_float',
+						'dimension9': 'EXT_disjoint_timer_query',
+						'dimension10': 'EXT_disjoint_timer_query_webgl2',
+						'dimension11': 'EXT_float_blend',
+						'dimension12': 'EXT_frag_depth',
+						'dimension13': 'EXT_shader_framebuffer_fetch',
+						'dimension14': 'EXT_shader_texture_lod',
+						'dimension15': 'EXT_sRGB',
+						'dimension16': 'EXT_texture_compression_bptc',
+						'dimension17': 'EXT_texture_compression_rgtc',
+						'dimension18': 'EXT_texture_filter_anisotropic',
+						'dimension19': 'EXT_texture_norm16',
+						'dimension20': 'KHR_parallel_shader_compile',
 
-				var pageviewData = {
-					'metric1': api + ''
+						'metric1': 'MAX_COMBINED_TEXTURE_IMAGE_UNITS',
+						'metric2': 'MAX_CUBE_MAP_TEXTURE_SIZE',
+						'metric3': 'MAX_FRAGMENT_UNIFORM_VECTORS',
+						'metric4': 'MAX_TEXTURE_IMAGE_UNITS',
+						'metric5': 'MAX_RENDERBUFFER_SIZE',
+						'metric6': 'MAX_TEXTURE_SIZE',
+						'metric7': 'MAX_VARYING_VECTORS',
+						'metric8': 'MAX_VERTEX_ATTRIBS',
+						'metric9': 'MAX_VERTEX_TEXTURE_IMAGE_UNITS',
+						'metric10': 'MAX_VERTEX_UNIFORM_VECTORS',
+					}
+				});
+				gtag('config', accountIds.account2, {
+					'custom_map': {
+						'dimension1': 'OES_draw_buffers_indexed',
+						'dimension2': 'OES_element_index_uint',
+						'dimension3': 'OES_fbo_render_mipmap',
+						'dimension4': 'OES_standard_derivatives',
+						'dimension5': 'OES_texture_float',
+						'dimension6': 'OES_texture_float_linear',
+						'dimension7': 'OES_texture_half_float',
+						'dimension8': 'OES_texture_half_float_linear',
+						'dimension9': 'OES_vertex_array_object',
+						'dimension10': 'OVR_multiview2',
+						'dimension11': 'WEBGL_blend_equation_advanced_coherent',
+						'dimension12': 'WEBGL_color_buffer_float',
+						'dimension13': 'WEBGL_compressed_texture_astc',
+						'dimension14': 'WEBGL_compressed_texture_etc',
+						'dimension15': 'WEBGL_compressed_texture_etc1',
+						'dimension16': 'WEBGL_compressed_texture_pvrtc',
+						'dimension17': 'WEBGL_compressed_texture_s3tc',
+						'dimension18': 'WEBGL_compressed_texture_s3tc_srgb',
+						'dimension19': 'WEBGL_debug',
+						'dimension20': 'WEBGL_debug_renderer_info',
+					}
+				});
+
+				var gl1 = document.createElement('canvas').getContext('webgl');
+				var gl2 = document.createElement('canvas').getContext('webgl2');
+				var wgpu = document.createElement('canvas').getContext('gpu') | document.createElement('canvas').getContext('gpu-present'); // subject to change
+
+				var data = {
+					'webgl1': gl1 != null, // webgl1 supported
+					'webgl2': gl2 != null, // webgl2 supported
+					'webgpu': wgpu != null, // webgpu supported
 				}
 
 				if (gl1 != null) {
@@ -100,17 +137,32 @@
 						'WEBGL_video_texture',
 					];
 
-					var extensionFlags = new Array(extensions.length);
 					for (var i = 0; i < extensions.length; i++) {
-						extensionFlags[i] = gl1.getExtension(extensions[i] != null);
+						data[extensions[i]] = gl1.getExtension(extensions[i]) != null;
 					}
 
-					pageviewData.metric2 = composeBitset(extensionFlags) + '';
+					var params = [
+						'MAX_COMBINED_TEXTURE_IMAGE_UNITS',
+						'MAX_CUBE_MAP_TEXTURE_SIZE',
+						'MAX_FRAGMENT_UNIFORM_VECTORS',
+						'MAX_TEXTURE_IMAGE_UNITS',
+						'MAX_RENDERBUFFER_SIZE',
+						'MAX_TEXTURE_SIZE',
+						'MAX_VARYING_VECTORS',
+						'MAX_VERTEX_ATTRIBS',
+						'MAX_VERTEX_TEXTURE_IMAGE_UNITS',
+						'MAX_VERTEX_UNIFORM_VECTORS',
+						// 'MAX_VIEWPORT_DIMS_X': ['account1', 'metric11'],
+						// 'MAX_VIEWPORT_DIMS_Y': ['account1', 'metric12'],
+					];
+
+					for (var i = 0; i < params.length; i++) {
+						data[params[i]] = gl1.getParameter(gl1[params[i]]);
+					}
 				}
 
-				console.log(pageviewData);
-
-				ga('send', 'pageview', pageviewData);
+				console.log(data);
+				gtag('event', 'pageview', data);
 			})();
 		</script>
 	</head>
