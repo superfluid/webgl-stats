@@ -8,6 +8,110 @@
 			function gtag(){dataLayer.push(arguments);}
 			gtag('js', new Date());
 			gtag('config', 'UA-178010779-1');
+			
+			// we have 20 numbers and 20 words to spend
+			// for extensions, we can do the same, tho we don't catch new / unknown extensions this way
+			// like 40 values
+			// how do we unpack this for graphing? -> Calculated metrics! But it's hard, we only have basic operators that probably doesn't include &
+
+			// we need to say, `what percent of page views had
+			/**
+			 * Metrics:
+			 * - `metric0` 'api-support' (scope: Hit, Formatting: Integer)
+			 * bitwise bool array
+			 * WebGL WebGL2 WebGPU
+			 */
+			// can compress webgl, webgl2 and webgpu support to 3 bits in 1 metric
+
+			(function(){
+				var canvas = document.createElement('canvas');
+				var gl1 = canvas.getContext('webgl');
+				var gl2 = canvas.getContext('webgl2');
+				var wgpu = canvas.getContext('gpu') | canvas.getContext('gpu-present');
+
+				function composeBitset(boolArray) {
+					var value = 0;
+					for (var i = 0; i < boolArray.length; i++)  {
+						value = value | ((boolArray[i]?1:0) << i);
+					}
+					return value;
+				}
+
+				var api = composeBitset([
+					gl1 != null,
+					gl2 != null,
+					wgpu != null,
+				]);
+
+				var pageviewData = {
+					'metric1': api + ''
+				}
+
+				if (gl1 != null) {
+					var extensions = [
+						'ANGLE_instanced_arrays',
+						'EXT_blend_minmax',
+						'EXT_clip_cull_distance',
+						'EXT_color_buffer_float',
+						'EXT_color_buffer_half_float',
+						'EXT_disjoint_timer_query',
+						'EXT_disjoint_timer_query_webgl2',
+						'EXT_float_blend',
+						'EXT_frag_depth',
+						'EXT_shader_framebuffer_fetch',
+						'EXT_shader_texture_lod',
+						'EXT_sRGB',
+						'EXT_texture_compression_bptc',
+						'EXT_texture_compression_rgtc',
+						'EXT_texture_filter_anisotropic',
+						'EXT_texture_norm16',
+						'KHR_parallel_shader_compile',
+						'OES_draw_buffers_indexed',
+						'OES_element_index_uint',
+						'OES_fbo_render_mipmap',
+						'OES_standard_derivatives',
+						'OES_texture_float',
+						'OES_texture_float_linear',
+						'OES_texture_half_float',
+						'OES_texture_half_float_linear',
+						'OES_vertex_array_object',
+						'OVR_multiview2',
+						'WEBGL_blend_equation_advanced_coherent',
+						'WEBGL_color_buffer_float',
+						'WEBGL_compressed_texture_astc',
+						'WEBGL_compressed_texture_etc',
+						'WEBGL_compressed_texture_etc1',
+						'WEBGL_compressed_texture_pvrtc',
+						'WEBGL_compressed_texture_s3tc',
+						'WEBGL_compressed_texture_s3tc_srgb',
+						'WEBGL_debug',
+						'WEBGL_debug_renderer_info',
+						'WEBGL_debug_shaders',
+						'WEBGL_depth_texture',
+						'WEBGL_draw_buffers',
+						'WEBGL_draw_instanced_base_vertex_base_instance',
+						'WEBGL_dynamic_texture',
+						'WEBGL_lose_context',
+						'WEBGL_multi_draw',
+						'WEBGL_multi_draw_instanced_base_vertex_base_instance',
+						'WEBGL_subarray_uploads',
+						'WEBGL_texture_multisample',
+						'WEBGL_texture_source_iframe',
+						'WEBGL_video_texture',
+					];
+
+					var extensionFlags = new Array(extensions.length);
+					for (var i = 0; i < extensions.length; i++) {
+						extensionFlags[i] = gl1.getExtension(extensions[i] != null);
+					}
+
+					pageviewData.metric2 = composeBitset(extensionFlags) + '';
+				}
+
+				console.log(pageviewData);
+
+				ga('send', 'pageview', pageviewData);
+			})();
 		</script>
 	</head>
 	<body>
